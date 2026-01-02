@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { SelectionState, Persona, Vertical, Level, SkillType, BuildType, RoadmapResult } from './types';
+import { SelectionState, Persona, Vertical, Level, SkillType, BuildType, RoadmapResult } from './types.ts';
 import { 
   PERSONA_DATA, 
   VERTICAL_DETAILS, 
@@ -8,10 +8,10 @@ import {
   SKILL_TYPE_DETAILS, 
   BUILD_TYPE_DETAILS, 
   LOGO 
-} from './constants';
-import { SelectionCard } from './components/SelectionCard';
-import { generateRoadmap } from './services/geminiService';
-import { OutputDisplay } from './components/OutputDisplay';
+} from './constants.tsx';
+import { SelectionCard } from './components/SelectionCard.tsx';
+import { generateRoadmap } from './services/geminiService.ts';
+import { OutputDisplay } from './components/OutputDisplay.tsx';
 
 const LOADING_PHASES = [
   { label: 'Waking up the silicon brain', message: "Botbrained Learn is hunting for coffee... and your 2026 survival guide." },

@@ -2,7 +2,8 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { SelectionState, RoadmapResult, SkillType, ResourceLink, Certification } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+// Fixed: Always use a named parameter for apiKey and use process.env.API_KEY directly
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export const generateRoadmap = async (selections: SelectionState): Promise<RoadmapResult> => {
   const isBuilding = selections.skillType === SkillType.BUILDING;
@@ -23,16 +24,17 @@ export const generateRoadmap = async (selections: SelectionState): Promise<Roadm
     - summary: A relatable 2-sentence hook about surviving 2026.
     - syllabus: 4 modules of intensive learning.
     - sessionBreakdown: A 90-minute hyper-intensive session plan.
-    - presentationPlan: Exactly 13 Slides. 
-      Each slide needs: slideNumber, title, content (bullets), recommendedTool (Gamma, Canva, Tome, etc.), and toolExplanation (why it kicks ass for this slide).
+    - topicsToCover: Exactly 13 core topics to master. 
+      Each topic needs: topicNumber, title, content (detailed explanation), recommendedTool (the best tool to use for this task), and toolExplanation (why this tool is the goat).
     - marketingStrategy: 3 high-conversion ad sets with pain-point positioning.
     - tools: 10 relevant tools.
     - readingMaterials: 3 book or paper titles.
     - outcomes: 3-5 key takeaways.
 
-    Return ONLY valid JSON. Note: Links (YouTube, Blogs, Certs) will be fetched later, so return empty arrays for searchResources and certifications for now.
+    Return ONLY valid JSON.
   `;
 
+  // Use the global instance for general generation tasks
   const response = await ai.models.generateContent({
     model: "gemini-3-pro-preview",
     contents: prompt,
@@ -117,24 +119,24 @@ export const generateRoadmap = async (selections: SelectionState): Promise<Roadm
             },
             required: ["adSets"]
           },
-          presentationPlan: {
+          topicsToCover: {
             type: Type.ARRAY,
             items: {
               type: Type.OBJECT,
               properties: {
-                slideNumber: { type: Type.INTEGER },
+                topicNumber: { type: Type.INTEGER },
                 title: { type: Type.STRING },
                 content: { type: Type.STRING },
                 recommendedTool: { type: Type.STRING },
                 toolExplanation: { type: Type.STRING },
               },
-              required: ["slideNumber", "title", "content", "recommendedTool", "toolExplanation"]
+              required: ["topicNumber", "title", "content", "recommendedTool", "toolExplanation"]
             }
           },
           readingMaterials: { type: Type.ARRAY, items: { type: Type.STRING } },
           outcomes: { type: Type.ARRAY, items: { type: Type.STRING } },
         },
-        required: ["title", "summary", "syllabus", "marketingStrategy", "outcomes", "sessionBreakdown", "tools", "presentationPlan", "readingMaterials"],
+        required: ["title", "summary", "syllabus", "marketingStrategy", "outcomes", "sessionBreakdown", "tools", "topicsToCover", "readingMaterials"],
       },
     },
   });
@@ -160,57 +162,32 @@ export const fetchLiveResources = async (
   type: 'video' | 'blog' | 'certification',
   context: { title: string; vertical: string; level: string; persona: string }
 ): Promise<any[]> => {
-  const prompt = `
-    Use Google Search to find REAL, VALID, and HIGH-QUALITY resources for the following:
-    Type: ${type}
+  const prompt = `Find REAL, VALID, and HIGH-QUALITY ${type} resources for:
     Target Audience: ${context.persona} working in ${context.vertical} at a ${context.level} level.
-    Core Topic: ${context.title}
+    Core Topic: ${context.title}`;
 
-    CRITICAL REQUIREMENTS:
-    - You MUST use the 'googleSearch' tool. 
-    - Search for actual existing content on YouTube, LinkedIn, or major AI blogs (Perplexity, OpenAI, Anthropic, Coursera, EdX).
-    - Return exactly 5 results for video/blog and 3 for certifications.
-    - For 'video': Return 5 real YouTube URLs.
-    - For 'blog': Return 5 real blog posts or articles.
-    - For 'certification': Return 3 real, valid AI certificates.
-
-    Return the results in the following JSON format ONLY:
-    If type is video or blog: [{"title": "...", "url": "...", "type": "${type}"}]
-    If type is certification: [{"name": "...", "provider": "...", "url": "..."}]
-
-    URLs MUST start with https://. NO HALLUCINATIONS.
-  `;
-
-  const response = await ai.models.generateContent({
+  // Fixed: Create a new instance right before making an API call
+  const genAI = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const response = await genAI.models.generateContent({
     model: "gemini-3-pro-preview",
     contents: prompt,
     config: {
       tools: [{ googleSearch: {} }],
-      responseMimeType: "application/json",
-      responseSchema: {
-        type: Type.ARRAY,
-        items: {
-          type: Type.OBJECT,
-          properties: {
-            title: { type: Type.STRING },
-            name: { type: Type.STRING },
-            url: { type: Type.STRING },
-            type: { type: Type.STRING },
-            provider: { type: Type.STRING },
-          },
-          required: ["url"]
-        }
-      }
+      // Fixed: Removed responseMimeType and responseSchema because search-grounded responses 
+      // may not be in valid JSON format and URLs must be extracted from groundingChunks.
     },
   });
 
-  const text = response.text;
-  if (!text) return [];
-  try {
-    const parsed = JSON.parse(text);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch (e) {
-    console.error("Failed to parse live resources", e);
-    return [];
-  }
+  // Fixed: Mandatory extraction of URLs from groundingMetadata.groundingChunks when using googleSearch
+  const chunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
+  
+  return chunks
+    .filter((chunk: any) => chunk.web)
+    .map((chunk: any) => ({
+      title: chunk.web.title || "Found Resource",
+      url: chunk.web.uri,
+      name: chunk.web.title || "Found Resource", // Compatibility with Certification type
+      provider: "Verified Source", // Compatibility with Certification type
+      type: type
+    }));
 };

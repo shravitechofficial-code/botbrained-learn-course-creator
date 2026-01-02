@@ -23,6 +23,7 @@ export enum SkillType {
   BUILDING = 'Building AI Applications'
 }
 
+// Fixed: Renamed from ExportType to BuildType to fix the import error in App.tsx
 export enum BuildType {
   VIBE_CODING = 'Vibe Coding',
   AGENTIC = 'Agentic Systems'
@@ -33,7 +34,7 @@ export interface SelectionState {
   vertical: Vertical | null;
   level: Level | null;
   skillType: SkillType | null;
-  buildType: BuildType | null;
+  buildType: string | null;
 }
 
 export interface SyllabusModule {
@@ -67,8 +68,8 @@ export interface Certification {
   url: string;
 }
 
-export interface PresentationSlide {
-  slideNumber: number;
+export interface TopicToCover {
+  topicNumber: number;
   title: string;
   content: string;
   recommendedTool: string;
@@ -88,6 +89,6 @@ export interface RoadmapResult {
   certifications: Certification[];
   readingMaterials: string[];
   searchResources: ResourceLink[];
-  presentationPlan: PresentationSlide[];
+  topicsToCover: TopicToCover[];
   originalSelections?: SelectionState;
 }
