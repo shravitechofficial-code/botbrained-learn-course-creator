@@ -1,0 +1,123 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Botbrained Learn | Roadmap Architect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Using standard script for html2pdf due to legacy UMD/ESM compatibility issues -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #020617; /* Slate 950 */
+            scroll-behavior: smooth;
+        }
+        @keyframes fade-in {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slide-in-from-bottom-4 {
+            from { transform: translateY(1rem); }
+            to { transform: translateY(0); }
+        }
+        .animate-in {
+            animation-fill-mode: both;
+        }
+        .fade-in {
+            animation-name: fade-in;
+        }
+        .slide-in-from-bottom-4 {
+            animation-name: slide-in-from-bottom-4;
+        }
+        .duration-500 {
+            animation-duration: 500ms;
+        }
+        .duration-700 {
+            animation-duration: 700ms;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Enhanced Print & PDF Styles */
+        @media print {
+            body {
+                background-color: white !important;
+                color: #0f172a !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .print\:hidden {
+                display: none !important;
+            }
+            .page-break-before {
+                page-break-before: always;
+            }
+            .page-break-inside-avoid {
+                page-break-inside: avoid !important;
+            }
+            @page {
+                margin: 1.5cm;
+                size: A4;
+            }
+        }
+
+        /* PDF Generation Specific Overrides - Ensuring "Beautiful Document" look */
+        .pdf-mode {
+            background-color: white !important;
+            color: #0f172a !important;
+            padding: 40px !important;
+            width: 800px !important; 
+            margin: 0 auto !important;
+        }
+        .pdf-mode h1 { font-size: 32pt !important; font-weight: 900 !important; color: #0f172a !important; }
+        .pdf-mode h2 { font-size: 24pt !important; font-weight: 800 !important; border-bottom: 2px solid #e2e8f0 !important; padding-bottom: 8px !important; margin-bottom: 16px !important; }
+        .pdf-mode h3 { font-size: 18pt !important; font-weight: 700 !important; color: #1e293b !important; }
+        .pdf-mode h4 { font-size: 14pt !important; font-weight: 700 !important; color: #334155 !important; }
+        .pdf-mode p, .pdf-mode li { color: #475569 !important; font-size: 11pt !important; line-height: 1.6 !important; }
+        
+        .pdf-mode .bg-white\/5, 
+        .pdf-mode .bg-indigo-600\/10,
+        .pdf-mode .bg-amber-500\/10,
+        .pdf-mode .bg-emerald-500\/10 {
+            background-color: #f8fafc !important;
+            border: 1px solid #e2e8f0 !important;
+            color: #1e293b !important;
+        }
+        
+        /* Force single column layout in PDF for readability */
+        .pdf-mode .grid {
+            display: block !important;
+        }
+        .pdf-mode .grid > div {
+            width: 100% !important;
+            margin-bottom: 24px !important;
+        }
+        .pdf-mode .lg\:col-span-2 {
+            width: 100% !important;
+        }
+        
+        .pdf-mode .text-indigo-400, .pdf-mode .text-indigo-500 { color: #4f46e5 !important; }
+        .pdf-mode .text-amber-500 { color: #d97706 !important; }
+        .pdf-mode .text-emerald-500 { color: #059669 !important; }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "@google/genai": "https://esm.sh/@google/genai@^1.34.0"
+  }
+}
+</script>
+</head>
+<body>
+    <div id="root"></div>
+</body>
+</html>
